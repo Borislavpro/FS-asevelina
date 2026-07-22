@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Фризьорски салон "Асевалина"</title>
+    <title>Салон "Асевалина" - Фризьор и Маникюр</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -28,7 +28,8 @@
                             border: '#2A2735',
                             rose: '#E8A598',
                             gold: '#D4AF37',
-                            accent: '#F3C5BA'
+                            accent: '#F3C5BA',
+                            pink: '#F472B6'
                         }
                     }
                 }
@@ -47,8 +48,18 @@
                 </div>
                 <div>
                     <h1 class="font-serif text-2xl sm:text-3xl font-bold tracking-wider text-white">АСЕВАЛИНА</h1>
-                    <p class="text-xs text-salon-rose tracking-widest uppercase font-semibold">Фризьорски салон • График</p>
+                    <p id="subHeaderTitle" class="text-xs text-salon-rose tracking-widest uppercase font-semibold">Фризьорски салон • График</p>
                 </div>
+            </div>
+
+            <!-- Tab Switcher (Фризьор / Маникюр) -->
+            <div class="bg-salon-bg border border-salon-border p-1.5 rounded-2xl flex items-center gap-1 shadow-inner">
+                <button id="tabHair" onclick="switchTab('hair')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 bg-gradient-to-r from-salon-rose via-salon-gold to-salon-accent text-salon-bg shadow-md">
+                    <i class="fa-solid fa-scissors"></i> Фризьор
+                </button>
+                <button id="tabMani" onclick="switchTab('mani')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-hand"></i> Маникюр
+                </button>
             </div>
 
             <!-- Navigation Controls & Notification Status -->
@@ -77,13 +88,13 @@
         <!-- Top Bar: Current Week & Quick Add Button -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-salon-card p-5 rounded-3xl border border-salon-border shadow-lg">
             <div>
-                <span class="text-xs text-salon-rose font-bold uppercase tracking-widest">Текущ период</span>
+                <span id="currentScopeBadge" class="text-xs text-salon-rose font-bold uppercase tracking-widest">Фризьорски график</span>
                 <h2 id="weekRangeTitle" class="font-serif text-2xl sm:text-3xl font-bold text-white">Зареждане на седмицата...</h2>
             </div>
             
             <button onclick="openBookingModal()" class="w-full md:w-auto px-6 py-3.5 bg-gradient-to-r from-salon-rose via-salon-gold to-salon-accent text-salon-bg font-bold rounded-2xl shadow-lg shadow-salon-rose/10 hover:opacity-95 transition-all flex items-center justify-center gap-2">
                 <i class="fa-solid fa-plus font-bold"></i>
-                Запиши час
+                <span id="addBtnText">Запиши час за фризьор</span>
             </button>
         </div>
 
@@ -100,7 +111,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-salon-border bg-salon-card py-5 text-center text-xs text-zinc-500">
-        <p>© 2026 Фризьорски салон "Асевалина". Всички права запазени.</p>
+        <p>© 2026 Салон "Асевалина". Всички права запазени.</p>
     </footer>
 
     <!-- ADD / EDIT APPOINTMENT MODAL -->
@@ -110,23 +121,23 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-1">Записване на час</h3>
+            <h3 id="modalTitle" class="font-serif text-2xl sm:text-3xl font-bold text-white mb-1">Записване на час</h3>
             <p class="text-xs text-zinc-400 mb-6">Попълнете желаните детайли (полетата не са задължителни).</p>
 
             <form id="appointmentForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Име на клиент</label>
-                    <input type="text" id="clientName" placeholder="" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                    <input type="text" id="clientName" placeholder="напр. Клиент" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Телефон</label>
-                        <input type="tel" id="clientPhone" placeholder="" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                        <input type="tel" id="clientPhone" placeholder="напр. 0888123456" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Услуга</label>
-                        <input type="text" id="serviceType" placeholder="" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                        <input type="text" id="serviceType" placeholder="напр. Маникюр / Боядисване" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
                     </div>
                 </div>
 
@@ -141,13 +152,13 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Цена</label>
-                        <input type="text" id="servicePrice" placeholder="" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                        <input type="text" id="servicePrice" placeholder="напр. 35 €" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Бележка (незадължително)</label>
-                    <textarea id="appointmentNote" rows="2" placeholder="" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm"></textarea>
+                    <textarea id="appointmentNote" rows="2" placeholder="напр. цвят, гел лак, декорация..." class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm"></textarea>
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full py-3.5 bg-gradient-to-r from-salon-rose via-salon-gold to-salon-accent text-salon-bg font-bold rounded-xl shadow-lg hover:opacity-95 transition-all mt-4 text-sm">
@@ -177,7 +188,13 @@
         const db = getFirestore(app);
 
         // ИЗОЛАЦИЯ НА ДАННИТЕ:
-        const COLLECTION_NAME = "asevalina_appointments";
+        const COLLECTIONS = {
+            hair: "asevalina_appointments",
+            mani: "asevalina_manicure_appointments"
+        };
+
+        // Active tab ('hair' or 'mani')
+        let activeTab = "hair";
 
         // Global State
         let currentDate = new Date();
@@ -192,13 +209,40 @@
             setInterval(checkUpcomingReminders, 30000);
         });
 
+        // Tab Switching Logic
+        window.switchTab = function(tab) {
+            activeTab = tab;
+            
+            const tabHair = document.getElementById('tabHair');
+            const tabMani = document.getElementById('tabMani');
+            const subHeader = document.getElementById('subHeaderTitle');
+            const currentScopeBadge = document.getElementById('currentScopeBadge');
+            const addBtnText = document.getElementById('addBtnText');
+
+            if (tab === 'hair') {
+                tabHair.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 bg-gradient-to-r from-salon-rose via-salon-gold to-salon-accent text-salon-bg shadow-md";
+                tabMani.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-zinc-400 hover:text-white transition-all flex items-center gap-2";
+                subHeader.innerText = "Фризьорски салон • График";
+                currentScopeBadge.innerText = "Фризьорски график";
+                addBtnText.innerText = "Запиши час за фризьор";
+            } else {
+                tabMani.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 bg-gradient-to-r from-salon-rose via-salon-gold to-salon-accent text-salon-bg shadow-md";
+                tabHair.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-zinc-400 hover:text-white transition-all flex items-center gap-2";
+                subHeader.innerText = "Салон за Маникюр • График";
+                currentScopeBadge.innerText = "График Маникюр";
+                addBtnText.innerText = "Запиши час за маникюр";
+            }
+
+            renderSchedule();
+        };
+
         // NOTIFICATION LOGIC
         window.requestNotificationPermission = function() {
             if ("Notification" in window) {
                 Notification.requestPermission().then(permission => {
                     checkNotificationStatus();
                     if (permission === "granted") {
-                        new Notification("Фризьорски салон Асевалина", {
+                        new Notification("Салон Асевалина", {
                             body: "Известията бяха успешно включени! Ще получавате напомняне 10 минути преди всеки час.",
                             icon: "https://cdn-icons-png.flaticon.com/512/3054/3054889.png"
                         });
@@ -235,14 +279,14 @@
                     // Разлика в минути
                     const diffInMinutes = Math.floor((appTime - now) / (1000 * 60));
 
-                    // Ако остават между 9 и 10 минути и не сме пращали известие за този час
                     if (diffInMinutes >= 9 && diffInMinutes <= 10 && !notifiedAppointments.has(app.id)) {
                         notifiedAppointments.add(app.id);
                         
                         const clientInfo = app.clientName && app.clientName !== '-' ? app.clientName : "Клиент";
-                        const serviceInfo = app.service && app.service !== '-' ? app.service : "Фризьорска услуга";
+                        const serviceInfo = app.service && app.service !== '-' ? app.service : "Услуга";
+                        const categoryInfo = activeTab === 'hair' ? 'Фризьор' : 'Маникюр';
 
-                        new Notification(`Напомняне: Предстоящ час след 10 мин!`, {
+                        new Notification(`[${categoryInfo}] Предстоящ час след 10 мин!`, {
                             body: `${app.time} ч. - ${clientInfo} (${serviceInfo})`,
                             icon: "https://cdn-icons-png.flaticon.com/512/3054/3054889.png",
                             requireInteraction: true
@@ -363,10 +407,11 @@
             }
         }
 
-        // Fetch Firestore Data
+        // Fetch Firestore Data based on Active Tab
         async function fetchAppointments() {
             try {
-                const querySnapshot = await getDocs(collection(db, COLLECTION_NAME));
+                const currentCollection = COLLECTIONS[activeTab];
+                const querySnapshot = await getDocs(collection(db, currentCollection));
                 appointments = [];
                 querySnapshot.forEach((docSnap) => {
                     appointments.push({
@@ -384,6 +429,7 @@
             document.getElementById('appointmentForm').reset();
             document.getElementById('appointmentDate').value = formatDate(new Date());
             document.getElementById('appointmentTime').value = "10:00";
+            document.getElementById('modalTitle').innerText = activeTab === 'hair' ? "Записване на час (Фризьор)" : "Записване на час (Маникюр)";
             document.getElementById('appointmentModal').classList.remove('hidden');
         };
 
@@ -391,6 +437,7 @@
             document.getElementById('appointmentForm').reset();
             document.getElementById('appointmentDate').value = dateStr;
             document.getElementById('appointmentTime').value = "10:00";
+            document.getElementById('modalTitle').innerText = activeTab === 'hair' ? "Записване на час (Фризьор)" : "Записване на час (Маникюр)";
             document.getElementById('appointmentModal').classList.remove('hidden');
         };
 
@@ -417,7 +464,8 @@
             };
 
             try {
-                await addDoc(collection(db, COLLECTION_NAME), newAppointment);
+                const currentCollection = COLLECTIONS[activeTab];
+                await addDoc(collection(db, currentCollection), newAppointment);
                 closeBookingModal();
                 await renderSchedule();
             } catch (error) {
@@ -432,7 +480,8 @@
         window.deleteAppointment = async function(id) {
             if (confirm("Сигурни ли сте, че искате да изтриете този час от графика?")) {
                 try {
-                    await deleteDoc(doc(db, COLLECTION_NAME, id));
+                    const currentCollection = COLLECTIONS[activeTab];
+                    await deleteDoc(doc(db, currentCollection, id));
                     await renderSchedule();
                 } catch (error) {
                     alert("Грешка при изтриването: " + error.message);
