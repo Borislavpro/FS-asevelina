@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фризьорски салон "Асевалина" - График</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Cormorant Garamond', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        salon: {
+                            bg: '#0F0E13',
+                            card: '#18161E',
+                            border: '#2A2735',
+                            rose: '#E8A598',
+                            gold: '#D4AF37',
+                            accent: '#F3C5BA'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-salon-bg text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-salon-rose selection:text-salon-bg">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-salon-border bg-salon-card/90 backdrop-blur sticky top-0 z-40 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-salon-rose via-salon-gold to-salon-accent flex items-center justify-center text-salon-bg font-serif font-bold text-2xl shadow-lg shadow-salon-rose/20">
+                    А
+                </div>
+                <div>
+                    <h1 class="font-serif text-2xl sm:text-3xl font-bold tracking-wider text-white">АСЕВАЛИНА</h1>
+                    <p class="text-xs text-salon-rose tracking-widest uppercase font-semibold">Фризьорски салон • График</p>
+                </div>
+            </div>
+
+            <!-- Navigation Controls & Notification Status -->
+            <div class="flex items-center gap-2 sm:gap-4 flex-wrap justify-center">
+                <button id="notifBtn" onclick="requestNotificationPermission()" class="px-3 py-2 rounded-xl border border-salon-border bg-salon-bg hover:border-salon-rose text-xs font-medium transition-all flex items-center gap-1.5 text-salon-gold">
+                    <i class="fa-solid fa-bell"></i> <span id="notifBtnText">Включи известия (10 мин.)</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="changeWeek(-1)" class="px-3.5 py-2 rounded-xl border border-salon-border bg-salon-bg hover:border-salon-rose text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left text-salon-rose"></i> Предишна
+                    </button>
+                    <button onclick="goToCurrentWeek()" class="px-4 py-2 rounded-xl bg-salon-border hover:bg-zinc-700 text-xs sm:text-sm font-semibold transition-all">
+                        Днес
+                    </button>
+                    <button onclick="changeWeek(1)" class="px-3.5 py-2 rounded-xl border border-salon-border bg-salon-bg hover:border-salon-rose text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5">
+                        Следваща <i class="fa-solid fa-chevron-right text-salon-rose"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow space-y-6">
+
+        <!-- Top Bar: Current Week & Quick Add Button -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-salon-card p-5 rounded-3xl border border-salon-border shadow-lg">
+            <div>
+                <span class="text-xs text-salon-rose font-bold uppercase tracking-widest">Текущ период</span>
+                <h2 id="weekRangeTitle" class="font-serif text-2xl sm:text-3xl font-bold text-white">Зареждане на седмицата...</h2>
+            </div>
+            
+            <button onclick="openBookingModal()" class="w-full md:w-auto px-6 py-3.5 bg-gradient-to-r from-salon-rose via-salon-gold to-salon-accent text-salon-bg font-bold rounded-2xl shadow-lg shadow-salon-rose/10 hover:opacity-95 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plus font-bold"></i>
+                Запиши час
+            </button>
+        </div>
+
+        <!-- Weekly Schedule Grid -->
+        <div id="weeklyGrid" class="grid grid-cols-1 md:grid-cols-7 gap-4">
+            <!-- 7 Days injected via JS -->
+            <div class="col-span-7 text-center py-12 text-zinc-500 font-medium">
+                <i class="fa-solid fa-circle-notch fa-spin text-2xl text-salon-rose mb-2"></i>
+                <p>Зареждане на графика...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-salon-border bg-salon-card py-5 text-center text-xs text-zinc-500">
+        <p>© 2026 Фризьорски салон "Асевалина". Всички права запазени.</p>
+    </footer>
+
+    <!-- ADD / EDIT APPOINTMENT MODAL -->
+    <div id="appointmentModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-salon-card border border-salon-border w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+            <button onclick="closeBookingModal()" class="absolute top-6 right-6 text-zinc-400 hover:text-white text-xl transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white mb-1">Записване на час</h3>
+            <p class="text-xs text-zinc-400 mb-6">Попълнете желаните детайли (полетата не са задължителни).</p>
+
+            <form id="appointmentForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Име на клиент</label>
+                    <input type="text" id="clientName" placeholder="напр. Мария Петрова" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Телефон</label>
+                        <input type="tel" id="clientPhone" placeholder="напр. 0888123456" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Услуга</label>
+                        <input type="text" id="serviceType" placeholder="напр. Боядисване / Балаяж" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Дата *</label>
+                        <input type="date" id="appointmentDate" required class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Час *</label>
+                        <input type="time" id="appointmentTime" required class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Цена</label>
+                        <input type="text" id="servicePrice" placeholder="напр. 35 €" class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Бележка (незадължително)</label>
+                    <textarea id="appointmentNote" rows="2" placeholder="напр. специфичен цвят боя..." class="w-full bg-salon-bg border border-salon-border rounded-xl px-4 py-3 text-white focus:border-salon-rose focus:outline-none transition-all text-sm"></textarea>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full py-3.5 bg-gradient-to-r from-salon-rose via-salon-gold to-salon-accent text-salon-bg font-bold rounded-xl shadow-lg hover:opacity-95 transition-all mt-4 text-sm">
+                    Запази часа
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FIREBASE & SCRIPT LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyB_sc3lJxoXBtvIUYdXf1FGmDV_rU1lgS8",
+          authDomain: "skubidu-database.firebaseapp.com",
+          projectId: "skubidu-database",
+          storageBucket: "skubidu-database.firebasestorage.app",
+          messagingSenderId: "805175251802",
+          appId: "1:805175251802:web:7a39232bf9b3608e58d963",
+          measurementId: "G-BV48XQJ3C5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ИЗОЛАЦИЯ НА ДАННИТЕ:
+        const COLLECTION_NAME = "asevalina_appointments";
+
+        // Global State
+        let currentDate = new Date();
+        let appointments = [];
+        let notifiedAppointments = new Set(); // За да не изпраща повтарящи се известия
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            renderSchedule();
+            checkNotificationStatus();
+            // Проверка за известия на всеки 30 секунди
+            setInterval(checkUpcomingReminders, 30000);
+        });
+
+        // NOTIFICATION LOGIC
+        window.requestNotificationPermission = function() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    checkNotificationStatus();
+                    if (permission === "granted") {
+                        new Notification("Фризьорски салон Асевалина", {
+                            body: "Известията бяха успешно включени! Ще получавате напомняне 10 минути преди всеки час.",
+                            icon: "https://cdn-icons-png.flaticon.com/512/3054/3054889.png"
+                        });
+                    }
+                });
+            } else {
+                alert("Вашият браузър не поддържа известия.");
+            }
+        };
+
+        function checkNotificationStatus() {
+            const btnText = document.getElementById('notifBtnText');
+            if ("Notification" in window) {
+                if (Notification.permission === "granted") {
+                    btnText.innerText = "Известията са активни ✓";
+                    document.getElementById('notifBtn').classList.add('border-emerald-500/50', 'text-emerald-400');
+                } else if (Notification.permission === "denied") {
+                    btnText.innerText = "Известията са блокирани";
+                }
+            }
+        }
+
+        function checkUpcomingReminders() {
+            if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+            const now = new Date();
+            const todayStr = formatDate(now);
+
+            appointments.forEach(app => {
+                if (app.date === todayStr && app.time) {
+                    const [hours, minutes] = app.time.split(':').map(Number);
+                    const appTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+                    
+                    // Разлика в минути
+                    const diffInMinutes = Math.floor((appTime - now) / (1000 * 60));
+
+                    // Ако остават между 9 и 10 минути и не сме пращали известие за този час
+                    if (diffInMinutes >= 9 && diffInMinutes <= 10 && !notifiedAppointments.has(app.id)) {
+                        notifiedAppointments.add(app.id);
+                        
+                        const clientInfo = app.clientName && app.clientName !== '-' ? app.clientName : "Клиент";
+                        const serviceInfo = app.service && app.service !== '-' ? app.service : "Фризьорска услуга";
+
+                        new Notification(`Напомняне: Предстоящ час след 10 мин!`, {
+                            body: `${app.time} ч. - ${clientInfo} (${serviceInfo})`,
+                            icon: "https://cdn-icons-png.flaticon.com/512/3054/3054889.png",
+                            requireInteraction: true
+                        });
+                    }
+                }
+            });
+        }
+
+        // Date Helpers
+        function getMonday(d) {
+            d = new Date(d);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDisplayDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            return `${day}.${month}`;
+        }
+
+        window.changeWeek = function(direction) {
+            currentDate.setDate(currentDate.getDate() + (direction * 7));
+            renderSchedule();
+        };
+
+        window.goToCurrentWeek = function() {
+            currentDate = new Date();
+            renderSchedule();
+        };
+
+        // Render Weekly Schedule
+        async function renderSchedule() {
+            const monday = getMonday(currentDate);
+            const sunday = new Date(monday);
+            sunday.setDate(sunday.getDate() + 6);
+
+            document.getElementById('weekRangeTitle').innerText = 
+                `${formatDisplayDate(monday)} - ${formatDisplayDate(sunday)} (${monday.getFullYear()} г.)`;
+
+            await fetchAppointments();
+            checkUpcomingReminders();
+
+            const grid = document.getElementById('weeklyGrid');
+            grid.innerHTML = "";
+
+            const daysOfWeek = ['Понеделник', 'Вторник', 'Сряда', 'Четвъртък', 'Петък', 'Събота', 'Неделя'];
+
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(monday);
+                dayDate.setDate(dayDate.getDate() + i);
+                const dateStr = formatDate(dayDate);
+                const isToday = formatDate(new Date()) === dateStr;
+
+                // Filter appointments for this specific day
+                const dayAppointments = appointments.filter(a => a.date === dateStr);
+                dayAppointments.sort((a, b) => a.time.localeCompare(b.time));
+
+                const dayCol = document.createElement('div');
+                dayCol.className = `bg-salon-card border ${isToday ? 'border-salon-rose ring-1 ring-salon-rose/50' : 'border-salon-border'} rounded-2xl p-4 flex flex-col min-h-[380px] transition-all`;
+
+                dayCol.innerHTML = `
+                    <div class="border-b border-salon-border pb-3 mb-3 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-semibold text-sm ${isToday ? 'text-salon-rose' : 'text-zinc-300'}">${daysOfWeek[i]}</h3>
+                            <p class="text-xs text-zinc-500">${formatDisplayDate(dayDate)}</p>
+                        </div>
+                        <button onclick="quickAdd('${dateStr}')" class="text-xs w-7 h-7 rounded-lg bg-salon-bg border border-salon-border hover:border-salon-rose text-salon-rose flex items-center justify-center transition-all" title="Запиши час за този ден">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-2.5 flex-grow overflow-y-auto max-h-[420px] pr-1">
+                        ${dayAppointments.length === 0 ? 
+                            `<div class="h-full flex flex-col items-center justify-center text-center py-8">
+                                <span class="text-zinc-700 text-2xl mb-1"><i class="fa-regular fa-calendar-xmark"></i></span>
+                                <p class="text-xs text-zinc-600">Свободен ден</p>
+                            </div>` : 
+                            dayAppointments.map(app => `
+                                <div class="bg-salon-bg border border-salon-border/80 hover:border-salon-rose/60 rounded-xl p-3 text-xs space-y-1.5 relative group transition-all">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-bold text-salon-gold flex items-center gap-1">
+                                            <i class="fa-regular fa-clock text-[10px]"></i> ${app.time} ч.
+                                        </span>
+                                        <button onclick="deleteAppointment('${app.id}')" class="text-zinc-500 hover:text-rose-400 opacity-80 group-hover:opacity-100 transition-opacity" title="Изтрий часа">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <strong class="text-white font-semibold text-sm block">${app.clientName || 'Без име'}</strong>
+                                        <p class="text-salon-rose font-medium flex justify-between items-center gap-2">
+                                            <span>${app.service || 'Услуга'}</span>
+                                            ${app.price && app.price !== '-' ? `<span class="text-salon-gold font-bold bg-salon-card px-2 py-0.5 rounded border border-salon-border/50 text-[11px]">${app.price}</span>` : ''}
+                                        </p>
+                                    </div>
+                                    ${app.clientPhone && app.clientPhone !== '-' ? `
+                                        <div class="pt-1 border-t border-salon-border/40 flex justify-between items-center text-[11px] text-zinc-400">
+                                            <span><i class="fa-solid fa-phone text-[9px] mr-1"></i>${app.clientPhone}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${app.note && app.note !== '-' ? `<p class="text-[10px] text-zinc-500 italic bg-salon-card/50 p-1.5 rounded border border-salon-border/30">${app.note}</p>` : ''}
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                `;
+
+                grid.appendChild(dayCol);
+            }
+        }
+
+        // Fetch Firestore Data
+        async function fetchAppointments() {
+            try {
+                const querySnapshot = await getDocs(collection(db, COLLECTION_NAME));
+                appointments = [];
+                querySnapshot.forEach((docSnap) => {
+                    appointments.push({
+                        id: docSnap.id,
+                        ...docSnap.data()
+                    });
+                });
+            } catch (error) {
+                console.error("Грешка при зареждане на данните:", error);
+            }
+        }
+
+        // Modal Controls
+        window.openBookingModal = function() {
+            document.getElementById('appointmentForm').reset();
+            document.getElementById('appointmentDate').value = formatDate(new Date());
+            document.getElementById('appointmentTime').value = "10:00";
+            document.getElementById('appointmentModal').classList.remove('hidden');
+        };
+
+        window.quickAdd = function(dateStr) {
+            document.getElementById('appointmentForm').reset();
+            document.getElementById('appointmentDate').value = dateStr;
+            document.getElementById('appointmentTime').value = "10:00";
+            document.getElementById('appointmentModal').classList.remove('hidden');
+        };
+
+        window.closeBookingModal = function() {
+            document.getElementById('appointmentModal').classList.add('hidden');
+        };
+
+        // Submit Form
+        document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Записване...";
+
+            const newAppointment = {
+                clientName: document.getElementById('clientName').value || '-',
+                clientPhone: document.getElementById('clientPhone').value || '-',
+                service: document.getElementById('serviceType').value || '-',
+                price: document.getElementById('servicePrice').value || '-',
+                date: document.getElementById('appointmentDate').value,
+                time: document.getElementById('appointmentTime').value,
+                note: document.getElementById('appointmentNote').value || '-',
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await addDoc(collection(db, COLLECTION_NAME), newAppointment);
+                closeBookingModal();
+                await renderSchedule();
+            } catch (error) {
+                alert("Грешка при запазването: " + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Запази часа";
+            }
+        });
+
+        // Delete Appointment
+        window.deleteAppointment = async function(id) {
+            if (confirm("Сигурни ли сте, че искате да изтриете този час от графика?")) {
+                try {
+                    await deleteDoc(doc(db, COLLECTION_NAME, id));
+                    await renderSchedule();
+                } catch (error) {
+                    alert("Грешка при изтриването: " + error.message);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
